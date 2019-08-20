@@ -81,6 +81,11 @@ Vagrant.configure("2") do |config|
       sudo cp /vagrant/ovpn-config/certs/ca.crt  /etc/openvpn/keys/
       sudo cp -f /vagrant/ovpn-config/scripts/client.conf /etc/openvpn/client
       sudo cp -f /vagrant/ovpn-config/scripts/openvpn-client@.service  /etc/systemd/system
+      sudo cp -f /vagrant/ovpn-config/scripts/bridge-start-client /etc/openvpn/
+      sudo chmod +x  /etc/openvpn/bridge-start-client
+      sudo cp -f /vagrant/ovpn-config/scripts/bridge-conf-client /etc/openvpn/
+      sudo cp -f /vagrant/ovpn-config/scripts/bridge-stop-client /etc/openvpn/
+      sudo chmod +x  /etc/openvpn/bridge-stop-client
       sudo systemctl daemon-reload
       sudo systemctl enable openvpn-client@client
 
@@ -97,6 +102,12 @@ Vagrant.configure("2") do |config|
     subconfig.vm.hostname = "client2"
     subconfig.vm.network :private_network, ip: "192.168.100.20", virtualbox__intnet: "client2"
   end
+
+  config.vm.define "client3" do |subconfig|
+    subconfig.vm.hostname = "client3"
+    subconfig.vm.network :private_network, ip: "192.168.100.30", virtualbox__intnet: "client2"
+  end
+
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
