@@ -49,15 +49,16 @@ Vagrant.configure("2") do |config|
       sudo cp -f /usr/share/easy-rsa/3/pki/issued/gw2.crt /vagrant/ovpn-config/certs/
       sudo cp -f /usr/share/easy-rsa/3/pki/private/gw2.key  /vagrant/ovpn-config/certs/
       sudo cp -f /usr/share/easy-rsa/3/pki/ca.crt  /vagrant/ovpn-config/certs/
-      sudo cp -f /vagrant/ovpn-config/scripts/server.conf /etc/openvpn/
+      sudo cp -f /vagrant/ovpn-config/scripts/gw1/openvpn.conf /etc/openvpn/
       sudo cp -f /vagrant/ovpn-config/scripts/bridge-start /etc/openvpn/
       sudo chmod +x  /etc/openvpn/bridge-start
-      sudo cp -f /vagrant/ovpn-config/scripts/bridge-conf /etc/openvpn/
+      sudo cp -f /vagrant/ovpn-config/scripts/gw1/bridge-conf /etc/openvpn/
       sudo cp -f /vagrant/ovpn-config/scripts/bridge-stop /etc/openvpn/
       sudo chmod +x  /etc/openvpn/bridge-stop
       sudo cp -f /vagrant/ovpn-config/scripts/openvpn@.service  /etc/systemd/system
       sudo systemctl daemon-reload
-      sudo systemctl enable openvpn@server
+      sudo systemctl enable openvpn@gw1
+      sudo systemctl start openvpn@gw1
     SHELL
 
   end
@@ -79,15 +80,16 @@ Vagrant.configure("2") do |config|
       sudo cp -f /vagrant/ovpn-config/certs/gw2.crt /etc/openvpn/keys/
       sudo cp -f /vagrant/ovpn-config/certs/gw2.key  /etc/openvpn/keys/
       sudo cp /vagrant/ovpn-config/certs/ca.crt  /etc/openvpn/keys/
-      sudo cp -f /vagrant/ovpn-config/scripts/client.conf /etc/openvpn/client
-      sudo cp -f /vagrant/ovpn-config/scripts/openvpn-client@.service  /etc/systemd/system
-      sudo cp -f /vagrant/ovpn-config/scripts/bridge-start-client /etc/openvpn/
-      sudo chmod +x  /etc/openvpn/bridge-start-client
-      sudo cp -f /vagrant/ovpn-config/scripts/bridge-conf-client /etc/openvpn/
-      sudo cp -f /vagrant/ovpn-config/scripts/bridge-stop-client /etc/openvpn/
-      sudo chmod +x  /etc/openvpn/bridge-stop-client
+      sudo cp -f /vagrant/ovpn-config/scripts/gw2/openvpn.conf /etc/openvpn/
+      sudo cp -f /vagrant/ovpn-config/scripts/bridge-start /etc/openvpn/
+      sudo chmod +x  /etc/openvpn/bridge-start
+      sudo cp -f /vagrant/ovpn-config/scripts/gw2/bridge-conf /etc/openvpn/
+      sudo cp -f /vagrant/ovpn-config/scripts/bridge-stop /etc/openvpn/
+      sudo chmod +x  /etc/openvpn/bridge-stop
+      sudo cp -f /vagrant/ovpn-config/scripts/openvpn@.service  /etc/systemd/system
       sudo systemctl daemon-reload
-      sudo systemctl enable openvpn-client@client
+      sudo systemctl enable openvpn@gw2
+      sudo systemctl start openvpn@gw2
 
     SHELL
   end
