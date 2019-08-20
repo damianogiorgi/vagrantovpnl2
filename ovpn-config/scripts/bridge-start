@@ -29,5 +29,6 @@ ifconfig $eth 0.0.0.0 promisc up
 
 ifconfig $br $eth_ip netmask $eth_netmask broadcast $eth_broadcast
 ip link set $br address $eth_mac
+brctl setageing $br 0
 # route add default gw $eth_gateway $br
 

@@ -23,9 +23,13 @@ Vagrant.configure("2") do |config|
     subconfig.vm.hostname = "gw1"
     subconfig.vm.network :private_network, ip: "192.168.100.1", virtualbox__intnet: "client1"
     subconfig.vm.network :private_network, ip: "192.168.200.1", virtualbox__intnet: "gwnetwork"
+    subconfig.vm.provider "virtualbox" do |virtualbox|
+      virtualbox.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+      virtualbox.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
+    end
     subconfig.vm.provision "shell", inline: <<-SHELL
       sudo yum install -y epel-release 
-      sudo yum install -y openvpn.x86_64 bridge-utils easy-rsa
+      sudo yum install -y openvpn.x86_64 bridge-utils easy-rsa tcpdump
       sudo echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
       sudo sysctl -p
       cd /usr/share/easy-rsa/3/
@@ -62,11 +66,24 @@ Vagrant.configure("2") do |config|
     subconfig.vm.hostname = "gw2"
     subconfig.vm.network :private_network, ip: "192.168.100.2", virtualbox__intnet: "client2"
     subconfig.vm.network :private_network, ip: "192.168.200.2", virtualbox__intnet: "gwnetwork"
+    subconfig.vm.provider "virtualbox" do |virtualbox|
+      virtualbox.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
+      virtualbox.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
+    end
     subconfig.vm.provision "shell", inline: <<-SHELL
       sudo yum install -y epel-release 
-      sudo yum install -y openvpn.x86_64 bridge-utils
+      sudo yum install -y openvpn.x86_64 bridge-utils tcpdump
       sudo echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
       sudo sysctl -p
+      sudo mkdir -p /etc/openvpn/keys
+      sudo cp -f /vagrant/ovpn-config/certs/gw2.crt /etc/openvpn/keys/
+      sudo cp -f /vagrant/ovpn-config/certs/gw2.key  /etc/openvpn/keys/
+      sudo cp /vagrant/ovpn-config/certs/ca.crt  /etc/openvpn/keys/
+      sudo cp -f /vagrant/ovpn-config/scripts/client.conf /etc/openvpn/client
+      sudo cp -f /vagrant/ovpn-config/scripts/openvpn-client@.service  /etc/systemd/system
+      sudo systemctl daemon-reload
+      sudo systemctl enable openvpn-client@client
+
     SHELL
   end
 
