@@ -6,13 +6,41 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure("2") do |config|
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
+
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
   # https://docs.vagrantup.com.
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "base"
+  config.vm.box = "centos/7"
+
+  config.vm.define "gw1" do |subconfig|
+    subconfig.vm.hostname = "gw1"
+    subconfig.vm.network :private_network, ip: "192.168.100.1", virtualbox__intnet: "client1"
+    subconfig.vm.network :private_network, ip: "192.168.200.1", virtualbox__intnet: "gwnetwork"
+  end
+
+  config.vm.define "gw2" do |subconfig|
+    subconfig.vm.hostname = "gw2"
+    subconfig.vm.network :private_network, ip: "192.168.100.2", virtualbox__intnet: "client2"
+    subconfig.vm.network :private_network, ip: "192.168.200.2", virtualbox__intnet: "gwnetwork"
+  end
+
+
+  config.vm.define "client1" do |subconfig|
+    subconfig.vm.hostname = "client1"
+    subconfig.vm.network :private_network, ip: "192.168.100.10", virtualbox__intnet: "client1"
+  end
+
+  config.vm.define "client2" do |subconfig|
+    subconfig.vm.hostname = "client2"
+    subconfig.vm.network :private_network, ip: "192.168.100.20", virtualbox__intnet: "client2"
+  end
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
