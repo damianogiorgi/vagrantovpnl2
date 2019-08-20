@@ -28,37 +28,9 @@ Vagrant.configure("2") do |config|
       virtualbox.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
     end
     subconfig.vm.provision "shell", inline: <<-SHELL
-      sudo yum install -y epel-release 
-      sudo yum install -y openvpn.x86_64 bridge-utils easy-rsa tcpdump
-      sudo echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
-      sudo sysctl -p
-      cd /usr/share/easy-rsa/3/
-      sudo /usr/share/easy-rsa/3/easyrsa --batch init-pki
-      sudo /usr/share/easy-rsa/3/easyrsa --batch build-ca nopass
-      sudo /usr/share/easy-rsa/3/easyrsa --batch gen-dh nopass
-      sudo /usr/share/easy-rsa/3/easyrsa --batch build-server-full gw1 nopass
-      sudo /usr/share/easy-rsa/3/easyrsa --batch build-client-full gw2 nopass
-      sudo mkdir -p /etc/openvpn/keys
-      sudo cp -f /vagrant/vars  /usr/share/easy-rsa/3/
-      sudo chmod +x /usr/share/easy-rsa/3/vars
-      sudo cp /usr/share/easy-rsa/3/pki/ca.crt  /etc/openvpn/keys/
-      sudo cp /usr/share/easy-rsa/3/pki/dh.pem  /etc/openvpn/keys/
-      sudo cp /usr/share/easy-rsa/3/pki/issued/gw1.crt /etc/openvpn/keys
-      sudo cp /usr/share/easy-rsa/3/pki/private/gw1.key /etc/openvpn/keys
-      sudo mkdir -p /vagrant/ovpn-config/certs/
-      sudo cp -f /usr/share/easy-rsa/3/pki/issued/gw2.crt /vagrant/ovpn-config/certs/
-      sudo cp -f /usr/share/easy-rsa/3/pki/private/gw2.key  /vagrant/ovpn-config/certs/
-      sudo cp -f /usr/share/easy-rsa/3/pki/ca.crt  /vagrant/ovpn-config/certs/
-      sudo cp -f /vagrant/ovpn-config/scripts/gw1/openvpn.conf /etc/openvpn/
-      sudo cp -f /vagrant/ovpn-config/scripts/bridge-start /etc/openvpn/
-      sudo chmod +x  /etc/openvpn/bridge-start
-      sudo cp -f /vagrant/ovpn-config/scripts/gw1/bridge-conf /etc/openvpn/
-      sudo cp -f /vagrant/ovpn-config/scripts/bridge-stop /etc/openvpn/
-      sudo chmod +x  /etc/openvpn/bridge-stop
-      sudo cp -f /vagrant/ovpn-config/scripts/openvpn@.service  /etc/systemd/system
-      sudo systemctl daemon-reload
-      sudo systemctl enable openvpn@gw1
-      sudo systemctl start openvpn@gw1
+    sudo /vagrant/ovpn-config/scripts/requirements.sh
+    sudo /vagrant/ovpn-config/scripts/gw1-easyrsa.sh
+    sudo /vagrant/ovpn-config/scripts/openvpnconf.sh gw1
     SHELL
 
   end
@@ -72,25 +44,9 @@ Vagrant.configure("2") do |config|
       virtualbox.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
     end
     subconfig.vm.provision "shell", inline: <<-SHELL
-      sudo yum install -y epel-release 
-      sudo yum install -y openvpn.x86_64 bridge-utils tcpdump
-      sudo echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
-      sudo sysctl -p
-      sudo mkdir -p /etc/openvpn/keys
-      sudo cp -f /vagrant/ovpn-config/certs/gw2.crt /etc/openvpn/keys/
-      sudo cp -f /vagrant/ovpn-config/certs/gw2.key  /etc/openvpn/keys/
-      sudo cp /vagrant/ovpn-config/certs/ca.crt  /etc/openvpn/keys/
-      sudo cp -f /vagrant/ovpn-config/scripts/gw2/openvpn.conf /etc/openvpn/
-      sudo cp -f /vagrant/ovpn-config/scripts/bridge-start /etc/openvpn/
-      sudo chmod +x  /etc/openvpn/bridge-start
-      sudo cp -f /vagrant/ovpn-config/scripts/gw2/bridge-conf /etc/openvpn/
-      sudo cp -f /vagrant/ovpn-config/scripts/bridge-stop /etc/openvpn/
-      sudo chmod +x  /etc/openvpn/bridge-stop
-      sudo cp -f /vagrant/ovpn-config/scripts/openvpn@.service  /etc/systemd/system
-      sudo systemctl daemon-reload
-      sudo systemctl enable openvpn@gw2
-      sudo systemctl start openvpn@gw2
-
+    sudo /vagrant/ovpn-config/scripts/requirements.sh
+    sudo /vagrant/ovpn-config/scripts/gw2-easyrsa.sh
+    sudo /vagrant/ovpn-config/scripts/openvpnconf.sh gw2
     SHELL
   end
 
