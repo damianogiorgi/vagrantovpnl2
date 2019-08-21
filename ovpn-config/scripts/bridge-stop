@@ -1,21 +1,24 @@
 #!/bin/bash
+for bridgeconf in /etc/openvpn/bridge-conf*
+do 
+        source $bridgeconf
+    ####################################
+    # Tear Down Ethernet bridge on Linux
+    ####################################
 
-. /etc/openvpn/bridge-conf
-####################################
-# Tear Down Ethernet bridge on Linux
-####################################
 
+    iptables -D INPUT -i $br -j ACCEPT
+    iptables -D FORWARD -i $br -j ACCEPT
 
-iptables -D INPUT -i $br -j ACCEPT
-iptables -D FORWARD -i $br -j ACCEPT
+    ifconfig $br down
+    brctl delbr $br
 
-ifconfig $br down
-brctl delbr $br
+    for t in $tap; do
+        openvpn --rmtun --dev $t
+        iptables -D INPUT -i $t -j ACCEPT
+    done
 
-for t in $tap; do
-    openvpn --rmtun --dev $t
-    iptables -D INPUT -i $t -j ACCEPT
+    ip addr add $eth_ip/$eth_prefix dev $eth
+    ip link set up dev $eth
+    # route add default gw $eth_gateway $eth
 done
-
-ifconfig $eth $eth_ip netmask $eth_netmask broadcast $eth_broadcast
-# route add default gw $eth_gateway $eth

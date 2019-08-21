@@ -1,34 +1,36 @@
 #!/bin/bash
+for bridgeconf in /etc/openvpn/bridge-conf*
+do 
+    source $bridgeconf
+    #################################
+    # Set up Ethernet bridge on Linux
+    # Requires: bridge-utils
+    #################################
 
-. /etc/openvpn/bridge-conf 
-#################################
-# Set up Ethernet bridge on Linux
-# Requires: bridge-utils
-#################################
+    for t in $tap; do
+        openvpn --mktun --dev $t
+    done
 
-for t in $tap; do
-    openvpn --mktun --dev $t
+    brctl addbr $br
+    brctl addif $br $eth
+
+    for t in $tap; do
+        brctl addif $br $t
+    done
+
+    for t in $tap; do
+        ifconfig $t 0.0.0.0 promisc up
+        iptables -A INPUT -i $t -j ACCEPT
+    done
+
+    iptables -A INPUT -i $br -j ACCEPT
+    iptables -A FORWARD -i $br -j ACCEPT
+
+    ifconfig $eth 0.0.0.0 promisc up
+
+    ip addr add $eth_ip/$eth_prefix dev $br 
+    ip link set $br address $eth_mac
+    ip link set up dev $br
+    brctl setageing $br 0
+    # route add default gw $eth_gateway $br
 done
-
-brctl addbr $br
-brctl addif $br $eth
-
-for t in $tap; do
-    brctl addif $br $t
-done
-
-for t in $tap; do
-    ifconfig $t 0.0.0.0 promisc up
-    iptables -A INPUT -i $t -j ACCEPT
-done
-
-iptables -A INPUT -i $br -j ACCEPT
-iptables -A FORWARD -i $br -j ACCEPT
-
-ifconfig $eth 0.0.0.0 promisc up
-
-ifconfig $br $eth_ip netmask $eth_netmask broadcast $eth_broadcast
-ip link set $br address $eth_mac
-brctl setageing $br 0
-# route add default gw $eth_gateway $br
-

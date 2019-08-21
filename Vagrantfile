@@ -21,8 +21,15 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "gw1" do |subconfig|
     subconfig.vm.hostname = "gw1"
+    # Client 1 network 
     subconfig.vm.network :private_network, ip: "192.168.100.1", virtualbox__intnet: "client1"
+
+    # Client 3 network
+    subconfig.vm.network :private_network, ip: "192.168.101.1", virtualbox__intnet: "client3"
+
+    # Link betweek gateways
     subconfig.vm.network :private_network, ip: "192.168.200.1", virtualbox__intnet: "gwnetwork"
+
     subconfig.vm.provider "virtualbox" do |virtualbox|
       virtualbox.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
       virtualbox.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
@@ -37,8 +44,15 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "gw2" do |subconfig|
     subconfig.vm.hostname = "gw2"
+    # Client 2 network
     subconfig.vm.network :private_network, ip: "192.168.100.2", virtualbox__intnet: "client2"
+
+    # Client 4 network
+    subconfig.vm.network :private_network, ip: "192.168.101.2", virtualbox__intnet: "client4"
+
+    # Link betweek gateways
     subconfig.vm.network :private_network, ip: "192.168.200.2", virtualbox__intnet: "gwnetwork"
+
     subconfig.vm.provider "virtualbox" do |virtualbox|
       virtualbox.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
       virtualbox.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
@@ -63,9 +77,14 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "client3" do |subconfig|
     subconfig.vm.hostname = "client3"
-    subconfig.vm.network :private_network, ip: "192.168.100.30", virtualbox__intnet: "client2"
+    subconfig.vm.network :private_network, ip: "192.168.101.10", virtualbox__intnet: "client3"
   end
 
+
+  config.vm.define "client4" do |subconfig|
+    subconfig.vm.hostname = "client4"
+    subconfig.vm.network :private_network, ip: "192.168.101.20", virtualbox__intnet: "client4"
+  end
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -83,10 +102,4 @@ Vagrant.configure("2") do |config|
   # via 127.0.0.1 to disable public access
   # config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
 
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  # config.vm.synced_folder "../data", "/vagrant_data"
-  
 end
