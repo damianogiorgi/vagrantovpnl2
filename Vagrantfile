@@ -1,31 +1,25 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# All Vagrant configuration is done below. The "2" in Vagrant.configure
-# configures the configuration version (we support older styles for
-# backwards compatibility). Please don't change it unless you know what
-# you're doing.
 Vagrant.configure("2") do |config|
 
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "1024"
   end
 
-  # The most common configuration options are documented and commented below.
-  # For a complete reference, please see the online documentation at
-  # https://docs.vagrantup.com.
-
-  # Every Vagrant development environment requires a box. You can search for
-  # boxes at https://vagrantcloud.com/search.
   config.vm.box = "geerlingguy/centos7"
 
   config.vm.define "gw1" do |subconfig|
     subconfig.vm.hostname = "gw1"
+
     # Client 1 network 
     subconfig.vm.network :private_network, ip: "192.168.100.1", virtualbox__intnet: "client1"
 
     # Client 3 network
     subconfig.vm.network :private_network, ip: "192.168.101.1", virtualbox__intnet: "client3"
+
+    # Client 5 network
+    subconfig.vm.network :private_network, ip: "192.168.102.1", virtualbox__intnet: "client5"
 
     # Link betweek gateways
     subconfig.vm.network :private_network, ip: "192.168.200.1", virtualbox__intnet: "gwnetwork"
@@ -33,6 +27,7 @@ Vagrant.configure("2") do |config|
     subconfig.vm.provider "virtualbox" do |virtualbox|
       virtualbox.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
       virtualbox.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
+      virtualbox.customize ["modifyvm", :id, "--nicpromisc4", "allow-all"]
     end
     subconfig.vm.provision "shell", inline: <<-SHELL
     sudo /vagrant/ovpn-config/scripts/requirements.sh
@@ -44,11 +39,15 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "gw2" do |subconfig|
     subconfig.vm.hostname = "gw2"
+    
     # Client 2 network
     subconfig.vm.network :private_network, ip: "192.168.100.2", virtualbox__intnet: "client2"
 
     # Client 4 network
     subconfig.vm.network :private_network, ip: "192.168.101.2", virtualbox__intnet: "client4"
+
+    # Client 6 network
+    subconfig.vm.network :private_network, ip: "192.168.102.2", virtualbox__intnet: "client6"
 
     # Link betweek gateways
     subconfig.vm.network :private_network, ip: "192.168.200.2", virtualbox__intnet: "gwnetwork"
@@ -56,6 +55,7 @@ Vagrant.configure("2") do |config|
     subconfig.vm.provider "virtualbox" do |virtualbox|
       virtualbox.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
       virtualbox.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"]
+      virtualbox.customize ["modifyvm", :id, "--nicpromisc4", "allow-all"]
     end
     subconfig.vm.provision "shell", inline: <<-SHELL
     sudo /vagrant/ovpn-config/scripts/requirements.sh
@@ -84,6 +84,16 @@ Vagrant.configure("2") do |config|
   config.vm.define "client4" do |subconfig|
     subconfig.vm.hostname = "client4"
     subconfig.vm.network :private_network, ip: "192.168.101.20", virtualbox__intnet: "client4"
+  end
+
+  config.vm.define "client5" do |subconfig|
+    subconfig.vm.hostname = "client5"
+    subconfig.vm.network :private_network, ip: "192.168.102.10", virtualbox__intnet: "client5"
+  end
+
+  config.vm.define "client6" do |subconfig|
+    subconfig.vm.hostname = "client6"
+    subconfig.vm.network :private_network, ip: "192.168.102.20", virtualbox__intnet: "client6"
   end
 
   # Disable automatic box update checking. If you disable this, then
